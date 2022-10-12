@@ -45,12 +45,13 @@ int rFrameTimeLeft   = rFrameTime;       //how many more frames does the current
 PImage[] blocks              = new PImage[1];         //all blocks are scaled to 10 times that of the orginal sprite
   //CONSTANT GROUND INDEXES
   int groundBlock            = 0;
-PImage[] decoPI              = new PImage[10];      
+PImage[] decoPI              = new PImage[6];      
 
 
 
 //OTHER IMAGES
 PImage title;
+PImage cursor;
 
 
 
@@ -77,6 +78,7 @@ void setup() {
 
   //size(800, 800);
   fullScreen();
+  noCursor();
   background(0);
 
 
@@ -140,12 +142,15 @@ void setup() {
   decoPI[3]        = loadImage("BlockSprites/bigHill.png");
   decoPI[4]        = loadImage("BlockSprites/smallTree.png");
   decoPI[5]        = loadImage("BlockSprites/bigTree.png");
-  decoPI[6]        = loadImage("BlockSprites/dark/bench.png");
+  /*decoPI[6]        = loadImage("BlockSprites/dark/bench.png");
   decoPI[7]        = loadImage("BlockSprites/dark/car.png");
   decoPI[8]        = loadImage("BlockSprites/dark/sign1.png");
   decoPI[9]        = loadImage("BlockSprites/dark/sign2.png");
+  Still not sure if I want to use these... they high-key ugly
+  */
 
   title          = loadImage("OtherSprites/title.png");
+  cursor         = loadImage("OtherSprites/cursor.png");
   //end get images
   
   
@@ -279,14 +284,14 @@ void draw() {
   }
   
   if(state != "die") {
-    for(int i = 0; i < floor.size(); i++) {                                    //runs until tile passes right side
+    for(int i = 0; i < floor.size(); i++) {                                 //runs until tile passes right side
   
       floor.get(i).x = floor.get(i).x - scrollSpeed;                        //move tiles left
   
   
-      if(floor.get(i).x < -imgScale/2 -imgScale) {                                                       //if tile is off screen left
+      if(floor.get(i).x < -imgScale/2 -imgScale) {                          //if tile is off screen left
        
-        floor.remove(i);                                                                       //remove from ArrayList
+        floor.remove(i);                                                    //remove from ArrayList
         floor.add(new PVector(floor.get(floor.size() - 1).x - scrollSpeed + imgScale + scrollSpeed, height / 2 + 4 * imgScale));     //add new position on right
         tileCounter ++;
         
@@ -312,7 +317,7 @@ void draw() {
       
       if(deco.get(i).x < -imgScale*3) {                                         //if tile is off screen left
        
-        deco.remove(i);           //remove from ArrayList
+        deco.remove(i);                                                         //remove from ArrayList
         savedDeco.remove(i);
         
       }
@@ -328,7 +333,7 @@ void draw() {
   //DRAWING
 
   //draw background
-  for(int i = 0; i < deco.size(); i++) {                        //runs once for every item in the arrayList
+  for(int i = 0; i < deco.size(); i++) {                            //runs once for every item in the arrayList
 
     image(decoPI[savedDeco.get(i)], deco.get(i).x, deco.get(i).y);  //draws ground
 
@@ -382,6 +387,8 @@ void draw() {
     
     }
   
+  
+  
   //END DRAWING
   
   
@@ -423,15 +430,20 @@ void draw() {
       
     }
     
-    println(fade);
   }
      
      //END DIE
   
   
-  
+  //draw cursor
+  cursor(mouseX, mouseY);
 }
  
+void cursor(float x, float y) {
+ image(cursor, x + imgScale/2, y + imgScale/2, imgScale, imgScale); 
+}
+  
+  
   
 void reset() {
   
@@ -450,17 +462,16 @@ void reset() {
    floor.clear();
    deco.clear();
   //generate initial floor
-  floor.add(new PVector(imgScale/2, height / 2 + 4 * imgScale));                       //add new PVector    
+  floor.add(new PVector(imgScale/2, height / 2 + 4 * imgScale));                           //add new PVector    
   for(int i = 1; (i * imgScale) < width + imgScale * 2; i = i + 1) {                       //initialize floor list 
 
-    floor.add(new PVector((i * imgScale) + imgScale / 2, height / 2 + 4 * imgScale));  //add new PVector   
+    floor.add(new PVector((i * imgScale) + imgScale / 2, height / 2 + 4 * imgScale));      //add new PVector   
     if(i % 7 == 0) {
      
        deco.add(new PVector((i * imgScale) + imgScale / 2, height / 2 + 3 * imgScale));
        savedDeco.add(int(random(0, decoPI.length)));
     }
    
-  } 
-  //end floor
+  }//end floor
    
-}
+}// end reset
