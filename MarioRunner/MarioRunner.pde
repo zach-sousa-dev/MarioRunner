@@ -42,10 +42,11 @@ int rFrameTimeLeft   = rFrameTime;       //how many more frames does the current
 
 
 //TILES
-PImage[] blocks     = new PImage[1];         //all blocks are scaled to 10 times that of the orginal sprite
+PImage[] blocks              = new PImage[1];         //all blocks are scaled to 10 times that of the orginal sprite
   //CONSTANT GROUND INDEXES
-  int groundBlock   = 0;
-PImage[] decoPI     = new PImage[4];         
+  int groundBlock            = 0;
+PImage[] decoPI              = new PImage[10];      
+
 
 
 //OTHER IMAGES
@@ -54,10 +55,12 @@ PImage title;
 
 
 //GROUND GENERATION
-ArrayList<PVector> floor = new ArrayList<PVector>();    //defines a new ArrayList of PVectors which 
-                                                        //we can add or remove from later
-ArrayList<PVector> deco  = new ArrayList<PVector>();                                                        
-                                                        
+ArrayList<PVector> floor      = new ArrayList<PVector>();    //defines a new ArrayList of PVectors which 
+                                                             //we can add or remove from later
+ArrayList<PVector> deco       = new ArrayList<PVector>();                                     
+ArrayList<Integer> savedDeco  = new ArrayList<Integer>();    //used to save tile type
+int tileCounter               = 0;
+int decoFreq                  = 75;                          //percent chance of spawning a bush or hill at every given interval                                                        
                                                         
 //SOUNDS
 SoundFile jump;
@@ -131,10 +134,16 @@ void setup() {
   
   blocks[0]      = loadImage("BlockSprites/ground1.png");
   
-  deco[0]        = loadImage("BlockSprites/smallBush.png");
-  deco[1]        = loadImage("BlockSprites/bigBush.png");
-  deco[2]        = loadImage("BlockSprites/smallHill.png");
-  deco[3]        = loadImage("BlockSprites/bigHill.png");
+  decoPI[0]        = loadImage("BlockSprites/smallBush.png");
+  decoPI[1]        = loadImage("BlockSprites/bigBush.png");
+  decoPI[2]        = loadImage("BlockSprites/smallHill.png");
+  decoPI[3]        = loadImage("BlockSprites/bigHill.png");
+  decoPI[4]        = loadImage("BlockSprites/smallTree.png");
+  decoPI[5]        = loadImage("BlockSprites/bigTree.png");
+  decoPI[6]        = loadImage("BlockSprites/dark/bench.png");
+  decoPI[7]        = loadImage("BlockSprites/dark/car.png");
+  decoPI[8]        = loadImage("BlockSprites/dark/sign1.png");
+  decoPI[9]        = loadImage("BlockSprites/dark/sign2.png");
 
   title          = loadImage("OtherSprites/title.png");
   //end get images
@@ -152,19 +161,24 @@ void setup() {
 
     blocks[i].resize(imgScale, imgScale);
   }
+  
+  for (int i = 0; i < decoPI.length; i++) {
+
+    decoPI[i].resize(imgScale * 5, 0);
+  }
   //end rescale all tiles
   
   
   
   //generate initial floor
   floor.add(new PVector(imgScale/2, height / 2 + 4 * imgScale));                       //add new PVector    
-  for(int i = 1; (i * imgScale) < width + imgScale; i = i + 1) {                       //initialize floor list 
+  for(int i = 1; (i * imgScale) < width + imgScale * 2; i = i + 1) {                       //initialize floor list 
 
     floor.add(new PVector((i * imgScale) + imgScale / 2, height / 2 + 4 * imgScale));  //add new PVector   
-    if(i % 3 == 0) {
+    if(i % 7 == 0) {
      
        deco.add(new PVector((i * imgScale) + imgScale / 2, height / 2 + 3 * imgScale));
-      
+       savedDeco.add(int(random(0, decoPI.length)));
     }
    
   } 
@@ -269,10 +283,37 @@ void draw() {
   
       floor.get(i).x = floor.get(i).x - scrollSpeed;                        //move tiles left
   
-      if(floor.get(i).x < -imgScale/2) {                                         //if tile is off screen left
+  
+      if(floor.get(i).x < -imgScale/2 -imgScale) {                                                       //if tile is off screen left
        
         floor.remove(i);                                                                       //remove from ArrayList
         floor.add(new PVector(floor.get(floor.size() - 1).x - scrollSpeed + imgScale + scrollSpeed, height / 2 + 4 * imgScale));     //add new position on right
+        tileCounter ++;
+        
+        if(tileCounter == 7) {
+         
+          if(int(random(0, 99)) < decoFreq) {
+            deco.add(new PVector(floor.get((floor.size() - 1)).x + imgScale * 3, height / 2 + 3 * imgScale));
+            savedDeco.add(int(random(0, decoPI.length)));
+            tileCounter = 0;
+          } else {
+            tileCounter = 0;
+          }
+          
+        }
+        
+      }
+      
+    }
+    
+    for(int i = 0; i < deco.size(); i++) {
+      
+      deco.get(i).x = deco.get(i).x - scrollSpeed;
+      
+      if(deco.get(i).x < -imgScale*3) {                                         //if tile is off screen left
+       
+        deco.remove(i);           //remove from ArrayList
+        savedDeco.remove(i);
         
       }
     }
@@ -285,6 +326,14 @@ void draw() {
 
 
   //DRAWING
+
+  //draw background
+  for(int i = 0; i < deco.size(); i++) {                        //runs once for every item in the arrayList
+
+    image(decoPI[savedDeco.get(i)], deco.get(i).x, deco.get(i).y);  //draws ground
+
+  }
+
 
   //draw mario
   image(mFrames[mCurFrame], mPos.x, mPos.y);
@@ -341,7 +390,7 @@ void draw() {
   
   //DIE 
   
-  /*if(meters > 150 && state != "die") {
+  if(meters > 150 && state != "die") {
    state        = "die"; 
    
    music[curTrack].stop();
@@ -352,7 +401,7 @@ void draw() {
    fade         = 0;
    
    delayLeft = delay;          //reset delay time
-  }*/
+  }
   
   
   if(state == "die") {
@@ -399,24 +448,19 @@ void reset() {
    music[curTrack].loop(1, 0.5);
    
    floor.clear();
-   //generate initial floor
-  floor.add(new PVector(imgScale/2, height / 2 + 4 * imgScale));  //add new PVector    
-  for(int i = 1; (i * imgScale) < width + imgScale; i = i + 1) {        //initialize floor list 
+   deco.clear();
+  //generate initial floor
+  floor.add(new PVector(imgScale/2, height / 2 + 4 * imgScale));                       //add new PVector    
+  for(int i = 1; (i * imgScale) < width + imgScale * 2; i = i + 1) {                       //initialize floor list 
 
-    floor.add(new PVector((i * imgScale) + imgScale / 2, height / 2 + 4 * imgScale));  //add new PVector               
+    floor.add(new PVector((i * imgScale) + imgScale / 2, height / 2 + 4 * imgScale));  //add new PVector   
+    if(i % 7 == 0) {
+     
+       deco.add(new PVector((i * imgScale) + imgScale / 2, height / 2 + 3 * imgScale));
+       savedDeco.add(int(random(0, decoPI.length)));
+    }
    
   } 
   //end floor
    
-}
-
-
-
-
-
-
-void spawnDecor() {
-  
-  
-  
 }
