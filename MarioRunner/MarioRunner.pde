@@ -7,7 +7,7 @@ int delayLeft       = delay;                              //delay time remaining
 
 
 
-//POSITON/PHYSICS DECLARATIONS
+//POSITON/PHYSICS
 PVector mPos           = new PVector(0, 0);        //default position
 boolean grounded       = false;                    //true if mario is on ground, otherwise false
 
@@ -23,9 +23,10 @@ float meters           = 0;                        //amount of blocks mario has 
 
 
 //DISPLAY VARIABLES
-int imgScale     = 50;               //CONSTANT sprite scale value
-PFont font;                          //font to be used for UI elements
-int fade         = 0;
+int imgScale                 = 50;                       //CONSTANT sprite scale value
+PFont font;                                              //font to be used for UI elements
+int fade                     = 0;                        //controls the opacity of the fading screen on a game over
+ArrayList<PVector> circles   = new ArrayList<PVector>(); //holds the position and size for each circle in the cursor trail
   
 
 
@@ -52,6 +53,9 @@ PImage[] decoPI              = new PImage[6];
 //OTHER IMAGES
 PImage title;
 PImage cursor;
+PImage[] notes       = new PImage[2];
+PVector mutePos      = new PVector(0 + imgScale * 2, 0 + imgScale * 2);
+boolean muted        = false;
 
 
 
@@ -78,6 +82,7 @@ void setup() {
 
   //size(800, 800);
   fullScreen();
+  frameRate(60);
   noCursor();
   background(0);
 
@@ -142,15 +147,18 @@ void setup() {
   decoPI[3]        = loadImage("BlockSprites/bigHill.png");
   decoPI[4]        = loadImage("BlockSprites/smallTree.png");
   decoPI[5]        = loadImage("BlockSprites/bigTree.png");
-  /*decoPI[6]        = loadImage("BlockSprites/dark/bench.png");
+/*decoPI[6]        = loadImage("BlockSprites/dark/bench.png");
   decoPI[7]        = loadImage("BlockSprites/dark/car.png");
   decoPI[8]        = loadImage("BlockSprites/dark/sign1.png");
   decoPI[9]        = loadImage("BlockSprites/dark/sign2.png");
   Still not sure if I want to use these... they high-key ugly
   */
+  
+  notes[0]         = loadImage("BlockSprites/note1.png");
+  notes[1]         = loadImage("BlockSprites/note2.png");
 
-  title          = loadImage("OtherSprites/title.png");
-  cursor         = loadImage("OtherSprites/cursor.png");
+  title            = loadImage("OtherSprites/title.png");
+  cursor           = loadImage("OtherSprites/cursor.png");
   //end get images
   
   
@@ -176,10 +184,10 @@ void setup() {
   
   
   //generate initial floor
-  floor.add(new PVector(imgScale/2, height / 2 + 4 * imgScale));                       //add new PVector    
+  floor.add(new PVector(imgScale/2, height / 2 + 4 * imgScale));                           //add new PVector    
   for(int i = 1; (i * imgScale) < width + imgScale * 2; i = i + 1) {                       //initialize floor list 
 
-    floor.add(new PVector((i * imgScale) + imgScale / 2, height / 2 + 4 * imgScale));  //add new PVector   
+    floor.add(new PVector((i * imgScale) + imgScale / 2, height / 2 + 4 * imgScale));      //add new PVector   
     if(i % 7 == 0) {
      
        deco.add(new PVector((i * imgScale) + imgScale / 2, height / 2 + 3 * imgScale));
@@ -191,6 +199,22 @@ void setup() {
   
   
   textFont(font);
+  
+}
+
+
+
+void mouseClicked(){
+  
+  if(mouseX < mutePos.x + imgScale/2 && mouseX > mutePos.x - imgScale/2 && mouseY < mutePos.y + imgScale/2 && mouseY > mutePos.y - imgScale/2) {
+   
+    if(muted == true) {
+      muted = false;
+    } else {
+      muted = true;
+    }
+    
+  }
   
 }
 
@@ -240,7 +264,7 @@ void draw() {
   
   
   if (grounded) {                                   //check if Mario is on the ground
-    mPos.y = height/2 + 3 * imgScale;                              //reset y position
+    mPos.y = height/2 + 3 * imgScale;               //reset y position
     mVel = 0;                                       //velocity is zero because not airborne
 
     //run animation
@@ -256,7 +280,7 @@ void draw() {
       rFrameTimeLeft --;                            //the animation has passed a frame
     } else {
       if (rFrameTimeLeft == 0) {                    //if the remaining frame time has reached 0
-        rFrameTimeLeft = rFrameTime;                      //reset counter
+        rFrameTimeLeft = rFrameTime;                //reset counter
       } else {
         rFrameTimeLeft --;                          //otherwise, animation passes a frame
       }
@@ -303,22 +327,23 @@ void draw() {
             tileCounter = 0;
           } else {
             tileCounter = 0;
-          }
-          
-        }
-        
+          } 
+        } 
       }
-      
     }
     
-    for(int i = 0; i < deco.size(); i++) {
+    for(int i = 0; i < deco.size(); i++) {                                        //tile pass and remove stuff again but for background elements
       
       deco.get(i).x = deco.get(i).x - scrollSpeed;
       
-      if(deco.get(i).x < -imgScale*3) {                                         //if tile is off screen left
+      if(deco.get(i).x < -imgScale*2.5) {                                         //if tile is off screen left
        
-        deco.remove(i);                                                         //remove from ArrayList
+        deco.remove(i);                                                           //remove from ArrayList
+    
         savedDeco.remove(i);
+        
+        i--;                                                                      //here we have to go back one index since the indexes will all shift downward
+                                                                                  //by 1 every time an object is removed
         
       }
     }
@@ -378,7 +403,13 @@ void draw() {
     //press escape
     text("ESC to QUIT", width/2, height/2 - imgScale * 9);
     
-    } 
+    if(muted == true){
+      image(notes[0], mutePos.x, mutePos.y, imgScale, imgScale);
+    } else {
+      image(notes[1], mutePos.x, mutePos.y, imgScale, imgScale);
+    }
+    
+  } 
     
     else if (state == "game"){
    
@@ -407,7 +438,7 @@ void draw() {
    mVel         = -15;         //bounce up
    fade         = 0;
    
-   delayLeft = delay;          //reset delay time
+   delayLeft = delay;          //reset delay time between game over and reset
   }
   
   
@@ -436,12 +467,37 @@ void draw() {
   
   
   //draw cursor
-  cursor(mouseX, mouseY);
+  cursor(mouseX + imgScale/2, mouseY + imgScale/2, imgScale, circles);
 }
  
-void cursor(float x, float y) {
- image(cursor, x + imgScale/2, y + imgScale/2, imgScale, imgScale); 
+ 
+ 
+ 
+ 
+void cursor(float x, float y, float siz, ArrayList<PVector> trail) {
+
+ PVector cur = new PVector(x, y, siz/3);
+ 
+ trail.add(cur);
+ 
+ for(int i = 0; i < trail.size(); i++) {
+  
+   fill(255);
+   noStroke();
+   ellipse(trail.get(i).x, trail.get(i).y, trail.get(i).z, trail.get(i).z);
+   trail.get(i).z --;
+   
+   if(trail.get(i).z <= 0){
+     trail.remove(i);
+   }
+   
+ }
+ 
+ image(cursor, x, y, siz, siz); 
+ 
 }
+  
+  
   
   
   
