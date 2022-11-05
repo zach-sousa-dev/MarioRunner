@@ -1,9 +1,10 @@
 import processing.sound.*;
 
+
 //GAME RULES
 String state         = "title";                           //controls the game state (title, playing, game over)
 int delay            = 360;                               //delay between a game over and restart
-int delayLeft       = delay;                              //delay time remaining
+int delayLeft        = delay;                             //delay time remaining
 
 
 
@@ -59,8 +60,9 @@ boolean muted        = false;
 
 
 
+
 //GROUND GENERATION
-ArrayList<PVector> floor      = new ArrayList<PVector>();    //defines a new ArrayList of PVectors which 
+ArrayList<Block> floor      = new ArrayList<Block>();        //defines a new ArrayList of PVectors which 
                                                              //we can add or remove from later
 ArrayList<PVector> deco       = new ArrayList<PVector>();                                     
 ArrayList<Integer> savedDeco  = new ArrayList<Integer>();    //used to save tile type
@@ -73,6 +75,7 @@ SoundFile lose;
 SoundFile[] music = new SoundFile[6];
 String[] tracks = new String[6];
 int curTrack;
+SoundFile coin;
 
 
 
@@ -100,6 +103,7 @@ void setup() {
   //assign sounds
   jump = new SoundFile(this, "Sounds/jump.wav");
   lose = new SoundFile(this, "Sounds/lose.mp3");
+  coin = new SoundFile(this, "Sounds/coin.wav");
   
   curTrack     = 0;
   music[0]     = new SoundFile(this, "Sounds/NSMBW Overworld Remix-Paul LeClair.mp3");
@@ -184,10 +188,10 @@ void setup() {
   
   
   //generate initial floor
-  floor.add(new PVector(imgScale/2, height / 2 + 4 * imgScale));                           //add new PVector    
+  floor.add(new Block(new PVector(imgScale/2, height / 2 + 4 * imgScale), blocks, 0, scrollSpeed));                           //add new block    
   for(int i = 1; (i * imgScale) < width + imgScale * 2; i = i + 1) {                       //initialize floor list 
 
-    floor.add(new PVector((i * imgScale) + imgScale / 2, height / 2 + 4 * imgScale));      //add new PVector   
+    floor.add(new Block(new PVector(imgScale/2, height / 2 + 4 * imgScale), blocks, 0, scrollSpeed));      //add new block   
     if(i % 7 == 0) {
      
        deco.add(new PVector((i * imgScale) + imgScale / 2, height / 2 + 3 * imgScale));
@@ -206,14 +210,16 @@ void setup() {
 
 void mouseClicked(){
   
-  if(mouseX < mutePos.x + imgScale/2 && mouseX > mutePos.x - imgScale/2 && mouseY < mutePos.y + imgScale/2 && mouseY > mutePos.y - imgScale/2) {
+  if(mouseX < mutePos.x + imgScale/2 && mouseX > mutePos.x - imgScale/2 && mouseY < mutePos.y + imgScale/2 && mouseY > mutePos.y - imgScale/2 && state == "title") {
    
     if(muted == true) {
       muted = false;
+      music[curTrack].loop(1, 0.5);
     } else {
       muted = true;
+      music[curTrack].stop();
     }
-    
+   jump.play();
   }
   
 }
@@ -249,7 +255,9 @@ void draw() {
      music[curTrack].stop();                                            //stop menu music
      state = "game";                                                    //now playing
      curTrack = (int)Math.round(Math.random() * (tracks.length - 1));   //randomize music
-     music[curTrack].loop(1, 0.5);                                      //loop music
+     if(!muted) {
+       music[curTrack].loop(1, 0.5);                                      //loop music
+     }
     }
   }
   
@@ -310,13 +318,13 @@ void draw() {
   if(state != "die") {
     for(int i = 0; i < floor.size(); i++) {                                 //runs until tile passes right side
   
-      floor.get(i).x = floor.get(i).x - scrollSpeed;                        //move tiles left
+      floor.get(i).getPos().x = floor.get(i).getPos().x - scrollSpeed;                        //move tiles left
   
   
-      if(floor.get(i).x < -imgScale/2 -imgScale) {                          //if tile is off screen left
+      if(floor.get(i).getPos().x < -imgScale/2 -imgScale) {                          //if tile is off screen left
        
         floor.remove(i);                                                    //remove from ArrayList
-        floor.add(new PVector(floor.get(floor.size() - 1).x - scrollSpeed + imgScale + scrollSpeed, height / 2 + 4 * imgScale));     //add new position on right
+        floor.add(new Block(new PVector(floor.get(floor.size() - 1).getPos().x + imgScale + scrollSpeed, height / 2 + 4 * imgScale)), blocks, 0, scrollSpeed);     //add new position on right
         tileCounter ++;
         
         if(tileCounter == 7) {
@@ -404,9 +412,9 @@ void draw() {
     text("ESC to QUIT", width/2, height/2 - imgScale * 9);
     
     if(muted == true){
-      image(notes[0], mutePos.x, mutePos.y, imgScale, imgScale);
-    } else {
       image(notes[1], mutePos.x, mutePos.y, imgScale, imgScale);
+    } else {
+      image(notes[0], mutePos.x, mutePos.y, imgScale, imgScale);
     }
     
   } 
@@ -513,7 +521,9 @@ void reset() {
    meters          = 0;
   
    curTrack        = 0;
-   music[curTrack].loop(1, 0.5);
+   if(!muted){
+     music[curTrack].loop(1, 0.5);
+   }
    
    floor.clear();
    deco.clear();
@@ -521,7 +531,7 @@ void reset() {
   floor.add(new PVector(imgScale/2, height / 2 + 4 * imgScale));                           //add new PVector    
   for(int i = 1; (i * imgScale) < width + imgScale * 2; i = i + 1) {                       //initialize floor list 
 
-    floor.add(new PVector((i * imgScale) + imgScale / 2, height / 2 + 4 * imgScale));      //add new PVector   
+  //  floor.add(new PVector(imgScale/2, height / 2 + 4 * imgScale);      //add new block   
     if(i % 7 == 0) {
      
        deco.add(new PVector((i * imgScale) + imgScale / 2, height / 2 + 3 * imgScale));
