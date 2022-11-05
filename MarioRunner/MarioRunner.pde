@@ -318,19 +318,19 @@ void draw() {
   if(state != "die") {
     for(int i = 0; i < floor.size(); i++) {                                 //runs until tile passes right side
   
-      floor.get(i).getPos().x = floor.get(i).getPos().x - scrollSpeed;                        //move tiles left
+      floor.get(i).update();                      //move tiles left
   
   
       if(floor.get(i).getPos().x < -imgScale/2 -imgScale) {                          //if tile is off screen left
        
         floor.remove(i);                                                    //remove from ArrayList
-        floor.add(new Block(new PVector(floor.get(floor.size() - 1).getPos().x + imgScale + scrollSpeed, height / 2 + 4 * imgScale)), blocks, 0, scrollSpeed);     //add new position on right
+        floor.add(new Block(new PVector(floor.get(floor.size() - 1).getPos().x + imgScale, height / 2 + 4 * imgScale), blocks, 0, scrollSpeed));     //add new position on right
         tileCounter ++;
         
         if(tileCounter == 7) {
          
           if(int(random(0, 99)) < decoFreq) {
-            deco.add(new PVector(floor.get((floor.size() - 1)).x + imgScale * 3, height / 2 + 3 * imgScale));
+            deco.add(new PVector(floor.get((floor.size() - 1)).getPos().x + imgScale * 3, height / 2 + 3 * imgScale));
             savedDeco.add(int(random(0, decoPI.length)));
             tileCounter = 0;
           } else {
@@ -388,7 +388,7 @@ void draw() {
   //draw ground
   for(int i = 0; i < floor.size(); i++) {                        //runs once for every item in the arrayList
 
-    image(blocks[groundBlock], floor.get(i).x, floor.get(i).y);  //draws ground
+    image(blocks[groundBlock], floor.get(i).getPos().x, floor.get(i).getPos().y);  //draws ground
 
   }
 
@@ -528,7 +528,7 @@ void reset() {
    floor.clear();
    deco.clear();
   //generate initial floor
-  floor.add(new PVector(imgScale/2, height / 2 + 4 * imgScale));                           //add new PVector    
+  floor.add(new Block(new PVector(imgScale/2, height / 2 + 4 * imgScale), blocks, 0, scrollSpeed));                           //add new PVector    
   for(int i = 1; (i * imgScale) < width + imgScale * 2; i = i + 1) {                       //initialize floor list 
 
   //  floor.add(new PVector(imgScale/2, height / 2 + 4 * imgScale);      //add new block   
