@@ -322,21 +322,21 @@ void draw() {
   }
   
   if(state != "die") {
-    for(int i = 0; i < floor.size(); i++) {                                 //runs until tile passes right side
+    for(int i = 0; i < floor.size(); i++) {                                                                                                          //runs until tile passes right side
   
-      floor.get(i).update();                      //move tiles left
+      floor.get(i).update();                                                                                                                         //move tiles left
       floor.get(i).scrlSpd = scrollSpeed;
   
   
-      if(floor.get(i).getPos().x < -imgScale/2 -imgScale) {                          //if tile is off screen left
+      if(floor.get(i).getPos().x < -imgScale/2 -imgScale) {                                                                                          //if tile is off screen left
        
-        floor.remove(i);                                                    //remove from ArrayList
+        floor.remove(i);                                                                                                                             //remove from ArrayList
         floor.add(new Block(new PVector(floor.get(floor.size() - 1).getPos().x + imgScale, height / 2 + 4 * imgScale), blocks, 0, scrollSpeed));     //add new position on right
         tileCounter ++;
         
         if(tileCounter == 7) {
          
-          if(int(random(0, 99)) < decoFreq) {
+          if(int(random(0, 100)) < decoFreq) {
             deco.add(new PVector(floor.get((floor.size() - 1)).getPos().x + imgScale * 3, height / 2 + 3 * imgScale));
             savedDeco.add(int(random(0, decoPI.length)));
             tileCounter = 0;
@@ -539,12 +539,12 @@ void reset() {
    deco.clear();
    tileCounter = 0;
   
-  for(int i = 0; (i * imgScale) < width + imgScale * 2; i = i + 1) {                                       //initialize floor list 
+  for(int i = 0; (i * imgScale) < width + imgScale * 2; i = i + 1) {                                       //run until a block can reach too far off screen
 
-    floor.add(new Block(new PVector(imgScale/2, height / 2 + 4 * imgScale), blocks, 0, scrollSpeed));      //PROBLEMATIC(?): Seems to be some delay when creating new Block()s, not sure exactly what is causing that
-    if(i % 7 == 0) {
+    floor.add(new Block(new PVector((i * imgScale) + imgScale/2, height / 2 + 4 * imgScale), blocks, 0, scrollSpeed));      //                      Thanks Mr. Rowbottom for helping with this segment
+    if(i % 7 == 0 && int(random(0, 99)) < decoFreq) {
      
-       deco.add(new PVector((i * imgScale) + imgScale / 2, height / 2 + 3 * imgScale));                    //PROBLEMATIC: a single background element SHOULD have a decoFreq% chance at spawning every 7 blocks, and it does during draw(), however now it seems to spawn some right next to each other during this for loop - it was working before
+       deco.add(new PVector((i * imgScale) + imgScale / 2, height / 2 + 3 * imgScale));                   
        savedDeco.add(int(random(0, decoPI.length)));
     }
    

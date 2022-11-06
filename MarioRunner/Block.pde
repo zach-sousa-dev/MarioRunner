@@ -4,7 +4,7 @@ PVector   pos;                 //current position
 PImage[]  tileset;             //array of images
 int       tileID;              //represents tile type, behaviors and looks (according to index of tileset)
 boolean   isSolid  = true;     //can player stand on the floor??
-double    scrlSpd  = 2.5;
+double    scrlSpd  = 2.5;      //speed that the tile moves across the screen
 
 
 
@@ -50,7 +50,7 @@ PVector getPos() {
 
 //update should be run inside the main game's draw() function
 void update() {
-  this.pos.x -= scrlSpd;
+  pos.x -= scrlSpd;
 }
 //end update
 
