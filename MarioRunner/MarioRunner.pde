@@ -155,8 +155,7 @@ void setup() {
   decoPI[7]        = loadImage("BlockSprites/dark/car.png");
   decoPI[8]        = loadImage("BlockSprites/dark/sign1.png");
   decoPI[9]        = loadImage("BlockSprites/dark/sign2.png");
-  Still not sure if I want to use these... they high-key ugly
-  */
+  Still not sure if I want to use these... they high-key ugly  */
   
   notes[0]         = loadImage("BlockSprites/note1.png");
   notes[1]         = loadImage("BlockSprites/note2.png");
@@ -187,7 +186,9 @@ void setup() {
   
   
   
-  //generate initial floor
+  
+  /*
+  ======= REPLACED BY reset() =======
   floor.add(new Block(new PVector(imgScale/2, height / 2 + 4 * imgScale), blocks, 0, scrollSpeed));                           //add new block    
   for(int i = 1; (i * imgScale) < width + imgScale * 2; i = i + 1) {                       //initialize floor list 
 
@@ -200,6 +201,11 @@ void setup() {
    
   } 
   //end floor
+  ======= REPLACED BY reset() =======
+  */
+  
+  
+  reset();
   
   
   textFont(font);
@@ -285,7 +291,7 @@ void draw() {
       } else {
         mCurFrame++;                                //otherwise advance to the next frame
       }
-      rFrameTimeLeft --;                            //the animation has passed a frame
+      rFrameTimeLeft --;                            //the animation has passed a frame, so reduce frames left by 1
     } else {
       if (rFrameTimeLeft == 0) {                    //if the remaining frame time has reached 0
         rFrameTimeLeft = rFrameTime;                //reset counter
@@ -367,7 +373,7 @@ void draw() {
   //DRAWING
 
   //draw background
-  for(int i = 0; i < deco.size(); i++) {                            //runs once for every item in the arrayList
+  for(int i = 0; i < deco.size(); i++) {                            //runs once for every item in the ArrayList
 
     image(decoPI[savedDeco.get(i)], deco.get(i).x, deco.get(i).y);  //draws ground
 
@@ -387,9 +393,9 @@ void draw() {
 
 
   //draw ground
-  for(int i = 0; i < floor.size(); i++) {                        //runs once for every item in the arrayList
+  for(int i = 0; i < floor.size(); i++) {                        //runs once for every item in the ArrayList
 
-    floor.get(i).show(imgScale);  //draws ground
+    floor.get(i).show(imgScale);                                 //draws ground
 
   }
 
@@ -412,6 +418,7 @@ void draw() {
     //press escape
     text("ESC to QUIT", width/2, height/2 - imgScale * 9);
     
+    //mute button
     if(muted == true){
       image(notes[1], mutePos.x, mutePos.y, imgScale, imgScale);
     } else {
@@ -466,7 +473,9 @@ void draw() {
       text("GAME OVER\n You Ran " + Math.round(meters) + " METERS", width/2, height/2);
       delayLeft--;
       
-      if(delayLeft <= 0) reset();
+      if(delayLeft <= 0) {
+        reset();
+      }
       
     }
     
@@ -528,14 +537,14 @@ void reset() {
    
    floor.clear();
    deco.clear();
-  //generate initial floor
-  floor.add(new Block(new PVector(imgScale/2, height / 2 + 4 * imgScale), blocks, 0, scrollSpeed));                           //add new block  
-  for(int i = 1; (i * imgScale) < width + imgScale * 2; i = i + 1) {                       //initialize floor list 
+   tileCounter = 0;
+  
+  for(int i = 0; (i * imgScale) < width + imgScale * 2; i = i + 1) {                                       //initialize floor list 
 
-    floor.add(new Block(new PVector(imgScale/2, height / 2 + 4 * imgScale), blocks, 0, scrollSpeed)); //add new block
+    floor.add(new Block(new PVector(imgScale/2, height / 2 + 4 * imgScale), blocks, 0, scrollSpeed));      //add new block
     if(i % 7 == 0) {
      
-       deco.add(new PVector((i * imgScale) + imgScale / 2, height / 2 + 3 * imgScale));
+       deco.add(new PVector((i * imgScale) + imgScale / 2, height / 2 + 3 * imgScale));                    //a single background element SHOULD have a decoFreq% chance at spawning every 7 blocks, and it does
        savedDeco.add(int(random(0, decoPI.length)));
     }
    
