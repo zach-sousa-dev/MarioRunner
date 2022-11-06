@@ -319,6 +319,7 @@ void draw() {
     for(int i = 0; i < floor.size(); i++) {                                 //runs until tile passes right side
   
       floor.get(i).update();                      //move tiles left
+      floor.get(i).scrlSpd = scrollSpeed;
   
   
       if(floor.get(i).getPos().x < -imgScale/2 -imgScale) {                          //if tile is off screen left
@@ -388,7 +389,7 @@ void draw() {
   //draw ground
   for(int i = 0; i < floor.size(); i++) {                        //runs once for every item in the arrayList
 
-    image(blocks[groundBlock], floor.get(i).getPos().x, floor.get(i).getPos().y);  //draws ground
+    floor.get(i).show(imgScale);  //draws ground
 
   }
 
@@ -528,10 +529,10 @@ void reset() {
    floor.clear();
    deco.clear();
   //generate initial floor
-  floor.add(new Block(new PVector(imgScale/2, height / 2 + 4 * imgScale), blocks, 0, scrollSpeed));                           //add new PVector    
+  floor.add(new Block(new PVector(imgScale/2, height / 2 + 4 * imgScale), blocks, 0, scrollSpeed));                           //add new block  
   for(int i = 1; (i * imgScale) < width + imgScale * 2; i = i + 1) {                       //initialize floor list 
 
-  //  floor.add(new PVector(imgScale/2, height / 2 + 4 * imgScale);      //add new block   
+    floor.add(new Block(new PVector(imgScale/2, height / 2 + 4 * imgScale), blocks, 0, scrollSpeed)); //add new block
     if(i % 7 == 0) {
      
        deco.add(new PVector((i * imgScale) + imgScale / 2, height / 2 + 3 * imgScale));
