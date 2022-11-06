@@ -40,7 +40,14 @@ void Block(PVector pos, PImage[] tileset, int tileID, double scrlSpd, boolean is
 
 
 
-//getPos returns the PVector of this position
+/** 
+*  getPos returns this object's position in a PVector
+*
+*  @return    position PVector
+*
+*  @version   1.00
+*  @author    Zachary Sousa
+*/
 PVector getPos() {
   return pos;
 }
@@ -48,7 +55,12 @@ PVector getPos() {
 
 
 
-//update should be run inside the main game's draw() function
+/** 
+*  update updates values such as position and should be run once every frame
+*
+*  @version     1.00
+*  @author      Zachary Sousa
+*/
 void update() {
   pos.x -= scrlSpd;
 }
@@ -56,7 +68,12 @@ void update() {
 
 
 
-//show draws the image
+/** 
+*  show draws the block at the current position using the previously inputted PImage[] and using a given scale
+*
+*  @version    1.00
+*  @author     Zachary Sousa
+*/
 void show(float imgScale) {
   image(tileset[tileID], pos.x, pos.y, imgScale, imgScale);
 }

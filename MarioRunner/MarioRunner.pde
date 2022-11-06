@@ -62,7 +62,7 @@ boolean muted        = false;
 
 
 //GROUND GENERATION
-ArrayList<Block> floor      = new ArrayList<Block>();        //defines a new ArrayList of PVectors which 
+ArrayList<Block> floor        = new ArrayList<Block>();      //defines a new ArrayList of Blocks which 
                                                              //we can add or remove from later
 ArrayList<PVector> deco       = new ArrayList<PVector>();                                     
 ArrayList<Integer> savedDeco  = new ArrayList<Integer>();    //used to save tile type
@@ -184,9 +184,6 @@ void setup() {
   }
   //end rescale all tiles
   
-  
-  
-  
   /*
   ======= REPLACED BY reset() =======
   floor.add(new Block(new PVector(imgScale/2, height / 2 + 4 * imgScale), blocks, 0, scrollSpeed));                           //add new block    
@@ -204,9 +201,7 @@ void setup() {
   ======= REPLACED BY reset() =======
   */
   
-  
   reset();
-  
   
   textFont(font);
   
@@ -491,7 +486,12 @@ void draw() {
  
  
  
- 
+/** 
+*  cursor draws a cursor at the mouse position and creates a simple trail behind it
+*
+*  @version     1.00
+*  @author      Zachary Sousa
+*/
 void cursor(float x, float y, float siz, ArrayList<PVector> trail) {
 
  PVector cur = new PVector(x, y, siz/3);
@@ -518,7 +518,12 @@ void cursor(float x, float y, float siz, ArrayList<PVector> trail) {
   
   
   
-  
+/** 
+*  reset resets all of the gameplay variables and states
+*
+*  @version     1.00
+*  @author      Zachary Sousa
+*/
 void reset() {
   
    state           = "title";
@@ -539,9 +544,9 @@ void reset() {
    deco.clear();
    tileCounter = 0;
   
-  for(int i = 0; (i * imgScale) < width + imgScale * 2; i = i + 1) {                                       //run until a block can reach too far off screen
-
-    floor.add(new Block(new PVector((i * imgScale) + imgScale/2, height / 2 + 4 * imgScale), blocks, 0, scrollSpeed));      //                      Thanks Mr. Rowbottom for helping with this segment
+  for(int i = 0; (i * imgScale) < width + imgScale * 2; i = i + 1) {                                                        //run until a block can reach too far off screen
+                                                                                                                            //Thanks Mr. Rowbottom for helping debug this segment
+    floor.add(new Block(new PVector((i * imgScale) + imgScale/2, height / 2 + 4 * imgScale), blocks, 0, scrollSpeed));      //add new block             
     if(i % 7 == 0 && int(random(0, 99)) < decoFreq) {
      
        deco.add(new PVector((i * imgScale) + imgScale / 2, height / 2 + 3 * imgScale));                   
