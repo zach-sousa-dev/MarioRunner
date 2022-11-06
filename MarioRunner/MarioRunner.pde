@@ -541,10 +541,10 @@ void reset() {
   
   for(int i = 0; (i * imgScale) < width + imgScale * 2; i = i + 1) {                                       //initialize floor list 
 
-    floor.add(new Block(new PVector(imgScale/2, height / 2 + 4 * imgScale), blocks, 0, scrollSpeed));      //add new block
+    floor.add(new Block(new PVector(imgScale/2, height / 2 + 4 * imgScale), blocks, 0, scrollSpeed));      //PROBLEMATIC(?): Seems to be some delay when creating new Block()s, not sure exactly what is causing that
     if(i % 7 == 0) {
      
-       deco.add(new PVector((i * imgScale) + imgScale / 2, height / 2 + 3 * imgScale));                    //a single background element SHOULD have a decoFreq% chance at spawning every 7 blocks, and it does
+       deco.add(new PVector((i * imgScale) + imgScale / 2, height / 2 + 3 * imgScale));                    //PROBLEMATIC: a single background element SHOULD have a decoFreq% chance at spawning every 7 blocks, and it does during draw(), however now it seems to spawn some right next to each other during this for loop - it was working before
        savedDeco.add(int(random(0, decoPI.length)));
     }
    
