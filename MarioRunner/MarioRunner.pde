@@ -220,7 +220,9 @@ void mouseClicked(){
       muted = true;
       music[curTrack].stop();
     }
-   coin.play();
+   if(!coin.isPlaying()) {
+     coin.play();
+   }
   }
   
 }
@@ -257,7 +259,7 @@ void draw() {
      state = "game";                                                    //now playing
      curTrack = (int)Math.round(Math.random() * (tracks.length - 1));   //randomize music
      if(!muted) {
-       music[curTrack].loop(1, 0.5);                                      //loop music
+       music[curTrack].loop(1, 0.5);                                    //loop music
      }
     }
   }
@@ -403,7 +405,11 @@ void draw() {
   //ui
   fill(255, 255, 255);
   //current track
-  text("Now Playing:\n" + tracks[curTrack], width/2, height/2 + imgScale * 8);
+  if(muted == true){
+      text("Muted", width/2, height/2 + imgScale * 8);
+    } else {
+      text("Now Playing:\n" + tracks[curTrack], width/2, height/2 + imgScale * 8);
+    }
 
   //title
   if(state == "title") {
