@@ -1,41 +1,28 @@
 class Block {
 
 PVector   pos;                 //current position
-PImage[]  tileset;             //array of images
-int       tileID;              //represents tile type, behaviors and looks (according to index of tileset)
+PImage    tile;                //tile to draw
 boolean   isSolid  = true;     //can player stand on the floor??
 double    scrlSpd  = 2.5;      //speed that the tile moves across the screen
+boolean   alive    = true;     //store whether the block is alive
 
+ArrayList<Block> arLi;         //ArrayList that this block is in
 
 
 //BLOCK CONSTRUCTORS
-public Block(PVector pos, PImage[] tileset, int tileID) {
+public Block(PVector pos, PImage tile, ArrayList<Block> arLi) {
   this.pos     = pos;
-  this.tileset = tileset;
-  this.tileID  = tileID;
+  this.tile    = tile;
+  this.arLi    = arLi;
 }
 
-public Block(PVector pos, PImage[] tileset, int tileID, double scrlSpd) {
+void Block(PVector pos, PImage tile, boolean isSolid, ArrayList<Block> arLi) {
   this.pos     = pos;
-  this.tileset = tileset;
-  this.tileID  = tileID;
-  this.scrlSpd = scrlSpd;
-}
-
-void Block(PVector pos, PImage[] tileset, int tileID, boolean isSolid) {
-  this.pos     = pos;
-  this.tileset = tileset;
-  this.tileID  = tileID;
+  this.tile    = tile;
+  this.arLi    = arLi;
   this.isSolid = isSolid;
 }
 
-void Block(PVector pos, PImage[] tileset, int tileID, double scrlSpd, boolean isSolid) {
-  this.pos     = pos;
-  this.tileset = tileset;
-  this.tileID  = tileID;
-  this.scrlSpd = scrlSpd;
-  this.isSolid = isSolid;
-}
 //END BLOCK CONSTRUCTORS
 
 
@@ -56,13 +43,27 @@ PVector getPos() {
 
 
 /** 
-*  update updates values such as position and should be run once every frame
+*  update updates values such as position and should be run once every frame, and removes when off the screen, AND also says whether the block is alive
 *
 *  @version     1.00
 *  @author      Zachary Sousa
 */
-void update() {
+boolean update(float scrlSpd, float imgScale) {
+  this.scrlSpd = scrlSpd;
   pos.x -= scrlSpd;
+  
+  if(pos.x < (0 - imgScale/2)) {
+    for(int i = 0; i < arLi.size(); i++) {
+      if(arLi.get(i).getPos().x == pos.x) {
+        arLi.remove(i);
+        alive = false;
+      }
+    }
+  } else {
+   alive = true; 
+  }
+  
+  return alive;
 }
 //end update
 
@@ -75,7 +76,7 @@ void update() {
 *  @author     Zachary Sousa
 */
 void show(float imgScale) {
-  image(tileset[tileID], pos.x, pos.y, imgScale, imgScale);
+  image(tile, pos.x, pos.y, imgScale, imgScale);
 }
 //end show
 

@@ -220,7 +220,7 @@ void mouseClicked(){
       muted = true;
       music[curTrack].stop();
     }
-   jump.play();
+   coin.play();
   }
   
 }
@@ -316,31 +316,36 @@ void draw() {
    scrollSpeed = 0; 
   }
   
-  if(state != "die") {
-    for(int i = 0; i < floor.size(); i++) {                                                                                                          //runs until tile passes right side
-  
-      floor.get(i).update();                                                                                                                         //move tiles left
-      floor.get(i).scrlSpd = scrollSpeed;
   
   
-      if(floor.get(i).getPos().x < -imgScale/2 -imgScale) {                                                                                          //if tile is off screen left
-       
-        floor.remove(i);                                                                                                                             //remove from ArrayList
-        floor.add(new Block(new PVector(floor.get(floor.size() - 1).getPos().x + imgScale, height / 2 + 4 * imgScale), blocks, 0, scrollSpeed));     //add new position on right
+  
+  if(state != "die") {      //scroll updates
+    for(int i = 0; i < floor.size(); i++) {                                                     //runs until tile passes right side 
+    
+      if(floor.get(i).update(scrollSpeed, imgScale) == false) {                                 //move tile, and check if tile is off screen left
+      
+        i--;
+        floor.add(new Block(new PVector(floor.get(floor.size() - 1).getPos().x + imgScale, height / 2 + 4 * imgScale), 
+                            blocks[0], 
+                            floor));                                                            //add new position on right
         tileCounter ++;
         
         if(tileCounter == 7) {
          
           if(int(random(0, 100)) < decoFreq) {
+            
             deco.add(new PVector(floor.get((floor.size() - 1)).getPos().x + imgScale * 3, height / 2 + 3 * imgScale));
             savedDeco.add(int(random(0, decoPI.length)));
             tileCounter = 0;
+            
           } else {
             tileCounter = 0;
           } 
         } 
       }
-    }
+    }// end scroll updates
+    
+    
     
     for(int i = 0; i < deco.size(); i++) {                                        //tile pass and remove stuff again but for background elements
       
@@ -354,7 +359,6 @@ void draw() {
         
         i--;                                                                      //here we have to go back one index since the indexes will all shift downward
                                                                                   //by 1 every time an object is removed
-        
       }
     }
   }
@@ -546,7 +550,7 @@ void reset() {
   
   for(int i = 0; (i * imgScale) < width + imgScale * 2; i = i + 1) {                                                        //run until a block can reach too far off screen
                                                                                                                             //Thanks Mr. Rowbottom for helping debug this segment
-    floor.add(new Block(new PVector((i * imgScale) + imgScale/2, height / 2 + 4 * imgScale), blocks, 0, scrollSpeed));      //add new block             
+    floor.add(new Block(new PVector((i * imgScale) + imgScale/2, height / 2 + 4 * imgScale), blocks[0], floor));            //add new block             
     if(i % 7 == 0 && int(random(0, 99)) < decoFreq) {
      
        deco.add(new PVector((i * imgScale) + imgScale / 2, height / 2 + 3 * imgScale));                   
