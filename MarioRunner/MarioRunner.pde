@@ -5,14 +5,15 @@ import processing.sound.*;
 String state         = "title";                           //controls the game state (title, playing, game over)
 int delay            = 360;                               //delay between a game over and restart
 int delayLeft        = delay;                             //delay time remaining
+int paused           = -1;
 
 
 
 //POSITON/PHYSICS
-PVector mPos           = new PVector(0, 0);        //default position
+/*PVector mPos           = new PVector(0, 0);        //default position
 boolean grounded       = false;                    //true if mario is on ground, otherwise false
 
-float mVel             = 0;                        //default y velocity
+float mVel             = 0;                        //default y velocity*/
 float g                = 0.5;                      //CONSTANT force of gravity
 
 float scrollSpeed      = 2.5;                      //speed of screen scrolling
@@ -35,11 +36,11 @@ ArrayList<PVector> circles   = new ArrayList<PVector>(); //holds the position an
 PImage[] mFrames     = new PImage[5];    //all sprites are scaled 10x original image (ex. 16x16 ==> 160x160
                                          //inside image processor, not including value of imgScale)
                                          
-int mCurFrame;                           //stores current Mario animation frame
+/*int mCurFrame;                           //stores current Mario animation frame
 int rFrameTime       = 3;                //amount frames for each frame of running animation
 int rFrameTimeLeft   = rFrameTime;       //how many more frames does the current frame last
   //CONSTANT ANIMATION INDEXES
-  int jumpFrame     = 3;
+  int jumpFrame     = 3;*/
 
 
 
@@ -72,11 +73,16 @@ int decoFreq                  = 75;                          //percent chance of
 //SOUNDS
 SoundFile jump;
 SoundFile lose;
+SoundFile pause;
 SoundFile[] music = new SoundFile[6];
 String[] tracks = new String[6];
 int curTrack;
 SoundFile coin;
 
+
+
+//PLAYER
+Mario mario = new Mario(new PVector(0, 0), g, imgScale);
 
 
 
@@ -97,13 +103,14 @@ void setup() {
   text("LOADING...", width/2, height/2);
   
   
-  mPos = new PVector(width/2, height/2 + 3 * imgScale);        //sets position to the middle of the screen
+  mario.mPos = new PVector(width/2, height/2 + 3 * imgScale);        //sets position to the middle of the screen
 
 
   //assign sounds
-  jump = new SoundFile(this, "Sounds/jump.wav");
-  lose = new SoundFile(this, "Sounds/lose.mp3");
-  coin = new SoundFile(this, "Sounds/coin.wav");
+  jump    = new SoundFile(this, "Sounds/jump.wav");
+  lose    = new SoundFile(this, "Sounds/lose.mp3");
+  coin    = new SoundFile(this, "Sounds/coin.wav");
+  pause   = new SoundFile(this, "Sounds/pause.wav");
   
   curTrack     = 0;
   music[0]     = new SoundFile(this, "Sounds/NSMBW Overworld Remix-Paul LeClair.mp3");
@@ -209,7 +216,7 @@ void setup() {
 
 
 
-void mouseClicked(){
+void mouseClicked() {
   
   if(mouseX < mutePos.x + imgScale/2 && mouseX > mutePos.x - imgScale/2 && mouseY < mutePos.y + imgScale/2 && mouseY > mutePos.y - imgScale/2 && state == "title") {
    
@@ -220,11 +227,20 @@ void mouseClicked(){
       muted = true;
       music[curTrack].stop();
     }
-   if(!coin.isPlaying()) {
-     coin.play();
-   }
+   //if(!coin.isPlaying()) {
+   coin.stop();
+   coin.play();
+   //}
   }
   
+}
+
+void keyReleased() {
+ if(key == ' ' && state == "game") {
+   paused = paused * -1;
+   pause.stop();
+   pause.play();
+ }
 }
 
 
@@ -233,26 +249,27 @@ void draw() {
 
   background(92, 148, 252);
 
-
+  mario.update(floor, state);
+  println(mario.mPos);
 
 
 
   //VVV GRAVITY AND JUMPING VVV
   
-  mPos.y += mVel;    //mario's y is increased (or decreased) by his velocity
+  //mPos.y += mVel;    //mario's y is increased (or decreased) by his velocity
   
-  if(state == "title" || state == "game") {
+  /*if(state == "title" || state == "game") {
     if(dist(0, mPos.y, 0, height / 2 + 3 * imgScale) < imgScale/4) {    //if mario is within 1/4 tile of his grounded y
       grounded = true;
     } else {
       grounded = false;
     }    
-  }
+  }*/
   
   
-  if(keyPressed && key == 'w' && grounded) {                            //if w is pressed and touching ground
-    grounded = false;                                                   //leave ground
-    mVel = -15;                                                         //decrease velocity (jump)
+  if(keyPressed && key == 'w' && mario.grounded) {                            //if w is pressed and touching ground
+    mario.grounded = false;                                                   //leave ground
+    mario.mVel = -15;                                                         //decrease velocity (jump)
     jump.play();
     if(state == "title") {
      music[curTrack].stop();                                            //stop menu music
@@ -265,16 +282,16 @@ void draw() {
   }
   
   
-  if (!grounded) {                      //check if Mario is NOT on the ground (airborne)
+  /*if (!grounded) {                      //check if Mario is NOT on the ground (airborne)
 
     mVel += g;                          //increase velocity by gravity
     
     if(state != "die") mCurFrame = jumpFrame;
     
-  }
+  }*/
   
   
-  if (grounded) {                                   //check if Mario is on the ground
+  /*if (grounded) {                                   //check if Mario is on the ground
     mPos.y = height/2 + 3 * imgScale;               //reset y position
     mVel = 0;                                       //velocity is zero because not airborne
 
@@ -296,7 +313,7 @@ void draw() {
         rFrameTimeLeft --;                          //otherwise, animation passes a frame
       }
     }
-  }
+  }*/
   
   //END GRAVITY AND JUMPING
   
@@ -321,15 +338,14 @@ void draw() {
   
   
   
-  if(state != "die") {      //scroll updates
+  if(state != "die" && paused == -1) {      //scroll updates
     for(int i = 0; i < floor.size(); i++) {                                                     //runs until tile passes right side 
     
-      if(floor.get(i).update(scrollSpeed, imgScale) == false) {                                 //move tile, and check if tile is off screen left
-      
+      if(floor.get(i).update(scrollSpeed, imgScale, floor) == false) {                                 //move tile, and check if tile is off screen left
         i--;
         floor.add(new Block(new PVector(floor.get(floor.size() - 1).getPos().x + imgScale, height / 2 + 4 * imgScale), 
-                            blocks[0], 
-                            floor));                                                            //add new position on right
+                            blocks[0] 
+                            ));                                                            //add new position on right
         tileCounter ++;
         
         if(tileCounter == 7) {
@@ -382,7 +398,7 @@ void draw() {
 
 
   //draw mario
-  image(mFrames[mCurFrame], mPos.x, mPos.y);
+  //image(mFrames[mCurFrame], mPos.x, mPos.y);
 
 
 
@@ -415,7 +431,7 @@ void draw() {
   if(state == "title") {
     
     //show title
-    image(title, width/2, height/2 - imgScale * 4);
+    //image(title, width/2, height/2 - imgScale * 4);
     
     //start button
     text("W to Jump", width/2, height/2 + imgScale);
@@ -435,7 +451,7 @@ void draw() {
     else if (state == "game"){
    
     //show meters
-    text(Math.round(meters) + "M", width/2, mPos.y - imgScale * 2);
+    text(Math.round(meters) + "M", width/2, mario.mPos.y - imgScale * 2);
     
     }
   
@@ -450,13 +466,13 @@ void draw() {
   //DIE 
   
   if(meters > 150 && state != "die") {
-   state        = "die"; 
+   state              = "die"; 
    
    music[curTrack].stop();
    lose.play(); 
-   mCurFrame    = 4;           //die animation
-   grounded     = false;
-   mVel         = -15;         //bounce up
+   mario.mCurFrame    = 4;           //die animation
+   mario.grounded     = false;
+   mario.mVel         = -15;         //bounce up
    fade         = 0;
    
    delayLeft = delay;          //reset delay time between game over and reset
@@ -538,8 +554,8 @@ void reset() {
   
    state           = "title";
    
-   mPos            = new PVector(width/2, height/2 + 3 * imgScale);
-   mVel            = 0;
+   mario.mPos      = new PVector(width/2, height/2 + 3 * imgScale);
+   mario.mVel      = 0;
    
    scrollSpeed     = 2.5;
    units           = 0;
@@ -556,7 +572,7 @@ void reset() {
   
   for(int i = 0; (i * imgScale) < width + imgScale * 2; i = i + 1) {                                                        //run until a block can reach too far off screen
                                                                                                                             //Thanks Mr. Rowbottom for helping debug this segment
-    floor.add(new Block(new PVector((i * imgScale) + imgScale/2, height / 2 + 4 * imgScale), blocks[0], floor));            //add new block             
+    floor.add(new Block(new PVector((i * imgScale) + imgScale/2, height / 2 + 4 * imgScale), blocks[0]));            //add new block             
     if(i % 7 == 0 && int(random(0, 99)) < decoFreq) {
      
        deco.add(new PVector((i * imgScale) + imgScale / 2, height / 2 + 3 * imgScale));                   
