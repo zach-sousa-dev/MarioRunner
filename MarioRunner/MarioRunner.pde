@@ -190,25 +190,8 @@ void setup() {
     decoPI[i].resize(imgScale * 5, 0);
   }
   //end rescale all tiles
-  
-  /*
-  ======= REPLACED BY reset() =======
-  floor.add(new Block(new PVector(imgScale/2, height / 2 + 4 * imgScale), blocks, 0, scrollSpeed));                           //add new block    
-  for(int i = 1; (i * imgScale) < width + imgScale * 2; i = i + 1) {                       //initialize floor list 
-
-    floor.add(new Block(new PVector(imgScale/2, height / 2 + 4 * imgScale), blocks, 0, scrollSpeed));      //add new block   
-    if(i % 7 == 0) {
-     
-       deco.add(new PVector((i * imgScale) + imgScale / 2, height / 2 + 3 * imgScale));
-       savedDeco.add(int(random(0, decoPI.length)));
-    }
-   
-  } 
-  //end floor
-  ======= REPLACED BY reset() =======
-  */
-  
-  reset();
+ 
+  reset();              //fill floor arraylist
   
   textFont(font);
   
@@ -249,22 +232,12 @@ void draw() {
 
   background(92, 148, 252);
 
-  mario.update(floor, state);
-  println(mario.mPos);
+  
 
 
 
   //VVV GRAVITY AND JUMPING VVV
   
-  //mPos.y += mVel;    //mario's y is increased (or decreased) by his velocity
-  
-  /*if(state == "title" || state == "game") {
-    if(dist(0, mPos.y, 0, height / 2 + 3 * imgScale) < imgScale/4) {    //if mario is within 1/4 tile of his grounded y
-      grounded = true;
-    } else {
-      grounded = false;
-    }    
-  }*/
   
   
   if(keyPressed && key == 'w' && mario.grounded) {                            //if w is pressed and touching ground
@@ -282,38 +255,7 @@ void draw() {
   }
   
   
-  /*if (!grounded) {                      //check if Mario is NOT on the ground (airborne)
-
-    mVel += g;                          //increase velocity by gravity
-    
-    if(state != "die") mCurFrame = jumpFrame;
-    
-  }*/
   
-  
-  /*if (grounded) {                                   //check if Mario is on the ground
-    mPos.y = height/2 + 3 * imgScale;               //reset y position
-    mVel = 0;                                       //velocity is zero because not airborne
-
-    //run animation
-    if (mCurFrame >= jumpFrame) {
-      mCurFrame = 0;
-    }
-    else if (rFrameTimeLeft == rFrameTime) {        //check if we are on a new animation "frame"
-      if (mCurFrame == 2) {
-        mCurFrame = 0;                              //reset loop so that we dont accidentally show jump frame
-      } else {
-        mCurFrame++;                                //otherwise advance to the next frame
-      }
-      rFrameTimeLeft --;                            //the animation has passed a frame, so reduce frames left by 1
-    } else {
-      if (rFrameTimeLeft == 0) {                    //if the remaining frame time has reached 0
-        rFrameTimeLeft = rFrameTime;                //reset counter
-      } else {
-        rFrameTimeLeft --;                          //otherwise, animation passes a frame
-      }
-    }
-  }*/
   
   //END GRAVITY AND JUMPING
   
@@ -395,19 +337,14 @@ void draw() {
     image(decoPI[savedDeco.get(i)], deco.get(i).x, deco.get(i).y);  //draws ground
 
   }
-
-
-  //draw mario
-  //image(mFrames[mCurFrame], mPos.x, mPos.y);
-
-
+  
+  //draw & update mario
+  mario.update(floor, state);
 
   //black backdrop
   rectMode(CORNER);
   fill(0);
   rect(0, height/2 + 3.5 *imgScale, width, height);
-
-
 
   //draw ground
   for(int i = 0; i < floor.size(); i++) {                        //runs once for every item in the ArrayList
@@ -431,7 +368,7 @@ void draw() {
   if(state == "title") {
     
     //show title
-    //image(title, width/2, height/2 - imgScale * 4);
+    image(title, width/2, height/2 - imgScale * 4);
     
     //start button
     text("W to Jump", width/2, height/2 + imgScale);
@@ -446,14 +383,10 @@ void draw() {
       image(notes[0], mutePos.x, mutePos.y, imgScale, imgScale);
     }
     
-  } 
-    
-    else if (state == "game"){
-   
+  } else if (state == "game"){
     //show meters
     text(Math.round(meters) + "M", width/2, mario.mPos.y - imgScale * 2);
-    
-    }
+  }
   
   
   
@@ -497,12 +430,8 @@ void draw() {
       if(delayLeft <= 0) {
         reset();
       }
-      
     }
-    
-  }
-     
-     //END DIE
+  }//END DIE
   
   
   //draw cursor
