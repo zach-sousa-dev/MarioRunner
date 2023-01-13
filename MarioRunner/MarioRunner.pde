@@ -52,6 +52,11 @@ PImage[] decoPI              = new PImage[6];
 
 
 
+//ENEMY IMAGES
+PImage[] gbaImgs = new PImage[3];
+
+
+
 //OTHER IMAGES
 PImage title;
 PImage cursor;
@@ -84,11 +89,19 @@ SoundFile coin;
 //PLAYER
 Mario mario = new Mario(new PVector(0, 0), g, imgScale);
 
+//test
+String[] eIds = {
+    "goomba"
+  };
+Enemy goomba = new Enemy(new PVector (100, 0), eIds[(int)random(eIds.length)]);
+
 
 
 
 void setup() {
 
+  
+  
   //size(800, 800);
   fullScreen();
   frameRate(60);
@@ -164,6 +177,12 @@ void setup() {
   decoPI[9]        = loadImage("BlockSprites/dark/sign2.png");
   Still not sure if I want to use these... they high-key ugly  */
   
+  gbaImgs[0] = loadImage("EnemySprites/goomba1.png");
+  gbaImgs[1] = loadImage("EnemySprites/goomba2.png");
+  gbaImgs[2] = loadImage("EnemySprites/goombadie.png");
+  
+  
+  
   notes[0]         = loadImage("BlockSprites/note1.png");
   notes[1]         = loadImage("BlockSprites/note2.png");
 
@@ -188,6 +207,11 @@ void setup() {
   for (int i = 0; i < decoPI.length; i++) {
 
     decoPI[i].resize(imgScale * 5, 0);
+  }
+  
+  for (int i = 0; i < gbaImgs.length; i++) {
+
+    gbaImgs[i].resize(imgScale, 0);
   }
   //end rescale all tiles
  
@@ -231,7 +255,7 @@ void keyReleased() {
 void draw() {
 
   background(92, 148, 252);
-
+  goomba.update();
   
 
 

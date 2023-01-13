@@ -61,7 +61,7 @@ class Mario {
       for(Block b : blockList) {
         if(abs(b.pos.y - mPos.y) <= siz && abs(b.pos.x - mPos.x) <= siz && b.isSolid) {
           stoodOn.add(b);
-          println(b.isSolid);
+          //println(b.isSolid);
         }
       }
       if(stoodOn.size() > 0) {
