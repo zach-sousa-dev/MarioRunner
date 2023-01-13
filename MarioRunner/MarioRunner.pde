@@ -229,10 +229,10 @@ void mouseClicked() {
    
     if(muted == true) {
       muted = false;
-      music[curTrack].loop(1, 0.5);
+      music[curTrack].play(1, 0.5);
     } else {
       muted = true;
-      music[curTrack].stop();
+      music[curTrack].pause();
     }
    //if(!coin.isPlaying()) {
    coin.stop();
@@ -247,6 +247,11 @@ void keyReleased() {
    paused = paused * -1;
    pause.stop();
    pause.play();
+   if(paused == 1 && !muted) {
+     music[curTrack].pause();
+   } else if(!muted) {
+     music[curTrack].play(1, 0.5);
+   }
  }
 }
 
@@ -255,15 +260,9 @@ void keyReleased() {
 void draw() {
 
   background(92, 148, 252);
-  goomba.update();
+  //goomba.update();
   
-
-
-
   //VVV GRAVITY AND JUMPING VVV
-  
-  
-  
   if(keyPressed && key == 'w' && mario.grounded) {                            //if w is pressed and touching ground
     mario.grounded = false;                                                   //leave ground
     mario.mVel = -15;                                                         //decrease velocity (jump)
@@ -277,19 +276,11 @@ void draw() {
      }
     }
   }
-  
-  
-  
-  
   //END GRAVITY AND JUMPING
   
-  
-  
-  
-  
-  //SCROLLING
-  
-  if(state == "game") {
+
+  //SCROLLING  
+  if(state == "game" && paused == -1) {
     units += scrollSpeed;                                                            //record total scroll distance since start
     meters = units / imgScale;                                                       //count meters
     scrollSpeed = 2.5 + ((int) meters / 10) * scrollSpeedInc;                        //increase scroll speed every 10 meters
@@ -349,12 +340,7 @@ void draw() {
   
   //END SCROLLING
   
-
-  
-
-
   //DRAWING
-
   //draw background
   for(int i = 0; i < deco.size(); i++) {                            //runs once for every item in the ArrayList
 
@@ -411,17 +397,10 @@ void draw() {
     //show meters
     text(Math.round(meters) + "M", width/2, mario.mPos.y - imgScale * 2);
   }
-  
-  
-  
   //END DRAWING
   
-  
-  
-  
-  
+
   //DIE 
-  
   if(meters > 150 && state != "die") {
    state              = "die"; 
    

@@ -47,11 +47,11 @@ class Mario {
     
     
     
-    if(grounded) {
+    /*if(grounded) {
      text("grounded", 100, 100);
     } else {
      text("airborne", 100, 100); 
-    }
+    }*/
   }
   
   
