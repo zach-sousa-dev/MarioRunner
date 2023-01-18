@@ -1,29 +1,81 @@
 class Enemy {
+  /* ENEMIES I WANNA ADD */
+  /*
+    REQUIRED FOR RELEASE
+    *goomba
+    *koopa
+    OPTIONAL / ILL DO IT LATER
+    *Piranha plant
+  */
 
-  PVector pos;
+  String id;    //stores enemy type (allowed are; "goomba"), these are randomly selected via an array in the main program
+  int lifetime = 0;  //how many frames has the enemy been alive
+  PImage frame = gbaImgs[0];   //stores the current anmation frame
   
+  int siz;
   
-  String id;
+  double speed = 1;
   
-  int lifetime = 0;
+  //POSITON/PHYSICS
+  PVector pos;  //enemy position
+  //float jumpVel          = 15;                       //starting jump velocity
+  float vel              = 0;                        //default y velocity
+  float g                = 0.5;                      //CONSTANT force of gravity
+  boolean grounded       = false;                    //are we touching the ground
   
-  PImage frame = gbaImgs[0];
+  //STORAGE
+  ArrayList<Block> stoodOn = new ArrayList<Block>();   //holds the current blocks that are being stood on (should be only a max of 2 I think)
   
+  //PLAYER
+  Mario mario;
+ 
   
-  public Enemy(PVector pos, String id) {
+  public Enemy(PVector pos, String id, int siz, Mario mario) {
     this.id    = id;
     this.pos   = pos;
+    this.siz   = siz;
+    this.mario = mario;
   }
   
   
-  
-  void update() {
+  //update should be called once every frame during gameplay
+  void update(ArrayList<Block> blocks, String state, float scrollSpeed) {
+    vel   += g;                //enemy's velocity increasing by gravity
+    pos.y += vel;              //enemy's y is increased (or decreased) by his velocity
+    pos.x -= scrollSpeed + speed;
+    
+    
     animate();
     show();
-    
+    stoodOn.clear();            //reset this arLi every frame, otherwise we might be standing on air or something dumb
+    if(groundCheck(blocks, state)) {
+      vel = 0;                  //enemy's velocity is set to 0 because he is not falling
+      pos.y = height/2 + (siz * 3);
+    }
     
     lifetime++;   //lifetime is increased at the end of each frame update
+    
+    if(abs(mario.mPos.x - pos.x) < siz) {
+      println("hit");
+      state = "die";
+    }
   }
+  
+  boolean groundCheck(ArrayList<Block> blockList, String state) {
+    if(state != "die") {
+      for(Block b : blockList) {
+        if(abs(b.pos.y - pos.y) <= siz && abs(b.pos.x - pos.x) <= siz && b.isSolid) {
+          stoodOn.add(b);
+          //println(b.isSolid);
+        }
+      }
+      if(stoodOn.size() > 0) {
+        return true;
+      }
+    }
+    return false;
+  }
+  
   
   void animate() {
    
@@ -36,7 +88,6 @@ class Enemy {
         }
       }
     }
-    
   }
   
   void show() {

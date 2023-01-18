@@ -92,8 +92,10 @@ Mario mario = new Mario(new PVector(0, 0), g, imgScale);
 //test
 String[] eIds = {
     "goomba"
-  };
-Enemy goomba = new Enemy(new PVector (100, 0), eIds[(int)random(eIds.length)]);
+};
+
+ArrayList<Enemy> enemies = new ArrayList<Enemy>();
+  
 
 
 
@@ -240,6 +242,9 @@ void mouseClicked() {
    //}
   }
   
+  enemies.add(new Enemy(new PVector (mouseX, mouseY), eIds[(int)random(eIds.length)], imgScale, mario));
+
+  
 }
 
 void keyReleased() {
@@ -260,7 +265,7 @@ void keyReleased() {
 void draw() {
 
   background(92, 148, 252);
-  //goomba.update();
+  
   
   //VVV GRAVITY AND JUMPING VVV
   if(keyPressed && key == 'w' && mario.grounded) {                            //if w is pressed and touching ground
@@ -349,7 +354,11 @@ void draw() {
   }
   
   //draw & update mario
-  mario.update(floor, state);
+  if(paused == -1) {
+    mario.update(floor, state);
+  } else {
+    mario.show(); 
+  }
 
   //black backdrop
   rectMode(CORNER);
@@ -439,6 +448,10 @@ void draw() {
   
   //draw cursor
   cursor(mouseX + imgScale/2, mouseY + imgScale/2, imgScale, circles);
+  
+  for(Enemy e : enemies) {
+    e.update(floor, state, scrollSpeed);
+  }
 }
  
  

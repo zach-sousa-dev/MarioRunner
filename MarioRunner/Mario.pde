@@ -12,7 +12,6 @@ class Mario {
   //POSITON/PHYSICS
   PVector mPos           = new PVector(0, 0);        //default position
   float jumpVel          = 15;                       //starting jump velocity
-  //boolean grounded       = false;                  //true if mario is on ground, otherwise false
   float mVel             = 0;                        //default y velocity
   float g                = 0.5;                      //CONSTANT force of gravity
   boolean grounded       = false;                    //are we touching the ground
@@ -32,26 +31,24 @@ class Mario {
   
   
   void update(ArrayList<Block> blockList, String state) {
-    mVel   += g;                 //mario's velocity increasing by gravity
-    mPos.y += mVel;              //mario's y is increased (or decreased) by his velocity
-    
-    stoodOn.clear();            //reset this arLi every frame, otherwise we might be standing on air or something dumb
-    grounded = groundCheck(blockList, state);
-    if(grounded) {
-      mVel = 0;                  //mario's velocity is set to 0 because he is not falling
-      mPos.y = height/2 + (siz * 3);
-    }
-    
-    animate(state);                   //choose animation frames
-    show();
-    
-    
-    
-    /*if(grounded) {
-     text("grounded", 100, 100);
-    } else {
-     text("airborne", 100, 100); 
-    }*/
+      mVel   += g;                 //mario's velocity increasing by gravity
+      mPos.y += mVel;              //mario's y is increased (or decreased) by his velocity
+      
+      stoodOn.clear();            //reset this arLi every frame, otherwise we might be standing on air or something dumb
+      grounded = groundCheck(blockList, state);
+      if(grounded) {
+        mVel = 0;                  //mario's velocity is set to 0 because he is not falling
+        mPos.y = height/2 + (siz * 3);
+      }
+      
+      animate(state);                   //choose animation frames
+      show();
+      
+      /*if(grounded) {
+       text("grounded", 100, 100);
+      } else {
+       text("airborne", 100, 100); 
+      }*/
   }
   
   
