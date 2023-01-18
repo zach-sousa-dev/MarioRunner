@@ -25,7 +25,8 @@ float meters           = 0;                        //amount of blocks mario has 
 
 
 //DISPLAY VARIABLES
-int imgScale                 = 50;                       //CONSTANT sprite scale value
+int imgScale                 = 85;                       //CONSTANT sprite scale value
+int fontSize                 = 84;                      //CONSTANT font size
 PFont font;                                              //font to be used for UI elements
 int fade                     = 0;                        //controls the opacity of the fading screen on a game over
 ArrayList<PVector> circles   = new ArrayList<PVector>(); //holds the position and size for each circle in the cursor trail
@@ -101,13 +102,12 @@ ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 
 
 void setup() {
-
-  
   
   //size(800, 800);
+  orientation(LANDSCAPE);
   fullScreen();
   frameRate(60);
-  noCursor();
+  //noCursor();
   background(0);
 
 
@@ -122,11 +122,12 @@ void setup() {
 
 
   //assign sounds
+  
   jump    = new SoundFile(this, "Sounds/jump.wav");
   lose    = new SoundFile(this, "Sounds/lose.mp3");
   coin    = new SoundFile(this, "Sounds/coin.wav");
   pause   = new SoundFile(this, "Sounds/pause.wav");
-  
+  /*
   curTrack     = 0;
   music[0]     = new SoundFile(this, "Sounds/NSMBW Overworld Remix-Paul LeClair.mp3");
   tracks[0]    = "NSMBW Overworld Remix - Paul Leclair";
@@ -145,16 +146,17 @@ void setup() {
   
   music[5]     = new SoundFile(this, "Sounds/Slide.mp3");
   tracks[5]    = "SM64 Slide Remix - Tater-Tot Tunes";
+  */
   //end assign sounds
   
 
   
-  music[0].loop(1, 0.5);    //loop menu music
+ // music[0].loop(1, 0.5);    //loop menu music
   
   
   
   //get fonts
-  font = createFont("Fonts/Pixel_NES.otf", 28);
+  font = createFont("Fonts/Pixel_NES.otf", fontSize);
   //end get fonts
   
 
@@ -231,10 +233,10 @@ void mouseClicked() {
    
     if(muted == true) {
       muted = false;
-      music[curTrack].play(1, 0.5);
+      //music[curTrack].play(1, 0.5);
     } else {
       muted = true;
-      music[curTrack].pause();
+      //music[curTrack].pause();
     }
    //if(!coin.isPlaying()) {
    coin.stop();
@@ -242,7 +244,7 @@ void mouseClicked() {
    //}
   }
   
-  enemies.add(new Enemy(new PVector (mouseX, mouseY), eIds[(int)random(eIds.length)], imgScale, mario));
+  enemies.add(new Enemy(new PVector (mouseX, mouseY), eIds[(int)random(eIds.length)], imgScale, mario, this));
 
   
 }
@@ -253,9 +255,9 @@ void keyReleased() {
    pause.stop();
    pause.play();
    if(paused == 1 && !muted) {
-     music[curTrack].pause();
+     //music[curTrack].pause();
    } else if(!muted) {
-     music[curTrack].play(1, 0.5);
+     //music[curTrack].play(1, 0.5);
    }
  }
 }
@@ -268,22 +270,23 @@ void draw() {
   
   
   //VVV GRAVITY AND JUMPING VVV
-  if(keyPressed && key == 'w' && mario.grounded) {                            //if w is pressed and touching ground
+  if((keyPressed && key == 'w' || mousePressed) && mario.grounded) {                            //if w is pressed and touching ground
     mario.grounded = false;                                                   //leave ground
     mario.mVel = -15;                                                         //decrease velocity (jump)
     jump.play();
     if(state == "title") {
-     music[curTrack].stop();                                            //stop menu music
+     //music[curTrack].stop();                                            //stop menu music
      state = "game";                                                    //now playing
      curTrack = (int)Math.round(Math.random() * (tracks.length - 1));   //randomize music
      if(!muted) {
-       music[curTrack].loop(1, 0.5);                                    //loop music
+       //music[curTrack].loop(1, 0.5);                                    //loop music
      }
     }
   }
   //END GRAVITY AND JUMPING
-  
-
+  if(mousePressed) {
+    enemies.add(new Enemy(new PVector (mouseX, mouseY), eIds[(int)random(eIds.length)], imgScale, mario));
+  }
   //SCROLLING  
   if(state == "game" && paused == -1) {
     units += scrollSpeed;                                                            //record total scroll distance since start
@@ -387,10 +390,10 @@ void draw() {
   if(state == "title") {
     
     //show title
-    image(title, width/2, height/2 - imgScale * 4);
+    image(title, width/2, height/2 - imgScale * 3);
     
     //start button
-    text("W to Jump", width/2, height/2 + imgScale);
+    text("TAP TO JUMP", width/2, height/2 + imgScale);
     
     //press escape
     text("ESC to QUIT", width/2, height/2 - imgScale * 9);
@@ -413,7 +416,7 @@ void draw() {
   if(meters > 150 && state != "die") {
    state              = "die"; 
    
-   music[curTrack].stop();
+   //music[curTrack].stop();
    lose.play(); 
    mario.mCurFrame    = 4;           //die animation
    mario.grounded     = false;
@@ -508,7 +511,7 @@ void reset() {
   
    curTrack        = 0;
    if(!muted){
-     music[curTrack].loop(1, 0.5);
+    // music[curTrack].loop(1, 0.5);
    }
    
    floor.clear();

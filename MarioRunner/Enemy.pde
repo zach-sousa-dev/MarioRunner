@@ -22,19 +22,23 @@ class Enemy {
   float vel              = 0;                        //default y velocity
   float g                = 0.5;                      //CONSTANT force of gravity
   boolean grounded       = false;                    //are we touching the ground
+  boolean hit            = false;
   
   //STORAGE
   ArrayList<Block> stoodOn = new ArrayList<Block>();   //holds the current blocks that are being stood on (should be only a max of 2 I think)
+  MarioRunner game         = new MarioRunner();
   
   //PLAYER
   Mario mario;
+  
  
   
-  public Enemy(PVector pos, String id, int siz, Mario mario) {
+  public Enemy(PVector pos, String id, int siz, Mario mario, MarioRunner game) {
     this.id    = id;
     this.pos   = pos;
     this.siz   = siz;
     this.mario = mario;
+    this.game  = game;
   }
   
   
@@ -57,9 +61,10 @@ class Enemy {
     
     if(abs(mario.mPos.x - pos.x) < siz) {
       println("hit");
-      state = "die";
+      game.state = "die";
     }
   }
+  
   
   boolean groundCheck(ArrayList<Block> blockList, String state) {
     if(state != "die") {
@@ -92,6 +97,5 @@ class Enemy {
   
   void show() {
     image(frame, pos.x, pos.y);
-    println(frame);
   }
 }
