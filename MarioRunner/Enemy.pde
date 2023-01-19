@@ -23,22 +23,22 @@ class Enemy {
   float g                = 0.5;                      //CONSTANT force of gravity
   boolean grounded       = false;                    //are we touching the ground
   boolean hit            = false;
-  
+  boolean deathAnim      = false;
+  boolean isAlive        = true;
+  int boost              = 20;
   //STORAGE
   ArrayList<Block> stoodOn = new ArrayList<Block>();   //holds the current blocks that are being stood on (should be only a max of 2 I think)
-  MarioRunner game         = new MarioRunner();
   
   //PLAYER
   Mario mario;
   
  
   
-  public Enemy(PVector pos, String id, int siz, Mario mario, MarioRunner game) {
+  public Enemy(PVector pos, String id, int siz, Mario mario) {
     this.id    = id;
     this.pos   = pos;
     this.siz   = siz;
     this.mario = mario;
-    this.game  = game;
   }
   
   
@@ -59,9 +59,12 @@ class Enemy {
     
     lifetime++;   //lifetime is increased at the end of each frame update
     
-    if(abs(mario.mPos.x - pos.x) < siz) {
+    if(abs(mario.mPos.x - pos.x) < siz && abs(mario.mPos.y - pos.y) < siz && !deathAnim) {
       println("hit");
-      game.state = "die";
+      hit = true;
+    } else if(abs(mario.mPos.x - pos.x) < siz && abs(mario.mPos.y - (pos.y - imgScale)) < siz/2) {
+      deathAnim = true;
+      mario.mVel -= boost;
     }
   }
   

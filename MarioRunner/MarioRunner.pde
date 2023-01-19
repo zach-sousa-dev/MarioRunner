@@ -26,7 +26,7 @@ float meters           = 0;                        //amount of blocks mario has 
 
 //DISPLAY VARIABLES
 int imgScale                 = 85;                       //CONSTANT sprite scale value
-int fontSize                 = 84;                      //CONSTANT font size
+int fontSize                 = 75;                       //CONSTANT font size
 PFont font;                                              //font to be used for UI elements
 int fade                     = 0;                        //controls the opacity of the fading screen on a game over
 ArrayList<PVector> circles   = new ArrayList<PVector>(); //holds the position and size for each circle in the cursor trail
@@ -217,6 +217,9 @@ void setup() {
 
     gbaImgs[i].resize(imgScale, 0);
   }
+  
+  title.resize(528 + imgScale, 381 + imgScale);
+  
   //end rescale all tiles
  
   reset();              //fill floor arraylist
@@ -244,7 +247,7 @@ void mouseClicked() {
    //}
   }
   
-  enemies.add(new Enemy(new PVector (mouseX, mouseY), eIds[(int)random(eIds.length)], imgScale, mario, this));
+  enemies.add(new Enemy(new PVector (mouseX, mouseY), eIds[(int)random(eIds.length)], imgScale, mario));
 
   
 }
@@ -287,6 +290,7 @@ void draw() {
   if(mousePressed) {
     enemies.add(new Enemy(new PVector (mouseX, mouseY), eIds[(int)random(eIds.length)], imgScale, mario));
   }
+  
   //SCROLLING  
   if(state == "game" && paused == -1) {
     units += scrollSpeed;                                                            //record total scroll distance since start
@@ -414,16 +418,7 @@ void draw() {
 
   //DIE 
   if(meters > 150 && state != "die") {
-   state              = "die"; 
-   
-   //music[curTrack].stop();
-   lose.play(); 
-   mario.mCurFrame    = 4;           //die animation
-   mario.grounded     = false;
-   mario.mVel         = -15;         //bounce up
-   fade         = 0;
-   
-   delayLeft = delay;          //reset delay time between game over and reset
+   die();
   }
   
   
@@ -452,9 +447,22 @@ void draw() {
   //draw cursor
   cursor(mouseX + imgScale/2, mouseY + imgScale/2, imgScale, circles);
   
-  for(Enemy e : enemies) {
-    e.update(floor, state, scrollSpeed);
+  if(state == "game") {
+    for(int i = 0; i < enemies.size(); i++) {
+      enemies.get(i).update(floor, state, scrollSpeed);
+      if(enemies.get(i).hit == true && state != "die") {
+        die();
+      }
+      if(enemies.get(i).pos.x < -imgScale/2) {
+        enemies.remove(i);
+        i--;
+      } else if(!enemies.get(i).isAlive) {
+        enemies.remove(i);
+        i--;
+      }
+    }
   }
+  println(enemies.size());
 }
  
  
@@ -529,4 +537,21 @@ void reset() {
    
   }//end floor
    
+  enemies.clear();
+   
 }// end reset
+
+
+
+void die() {
+   state              = "die"; 
+   
+   //music[curTrack].stop();
+   lose.play(); 
+   mario.mCurFrame    = 4;           //die animation
+   mario.grounded     = false;
+   mario.mVel         = -15;         //bounce up
+   fade               = 0;
+   
+   delayLeft          = delay;          //reset delay time between game over and reset 
+  }
