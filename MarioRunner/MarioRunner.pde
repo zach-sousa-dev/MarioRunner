@@ -55,6 +55,7 @@ PImage[] decoPI              = new PImage[6];
 
 //ENEMY IMAGES
 PImage[] gbaImgs = new PImage[3];
+PImage[] kpaImgs = new PImage[3];
 
 
 
@@ -74,7 +75,9 @@ ArrayList<Block> floor        = new ArrayList<Block>();      //defines a new Arr
 ArrayList<PVector> deco       = new ArrayList<PVector>();                                     
 ArrayList<Integer> savedDeco  = new ArrayList<Integer>();    //used to save tile type
 int tileCounter               = 0;
-int decoFreq                  = 75;                          //percent chance of spawning a bush or hill at every given interval                                                        
+int decoFreq                  = 75;                          //percent chance of spawning a bush or hill at every given interval              
+
+int enemyChance               = 15;                           //percent chance of spawning an enemy on a block
                                                         
 //SOUNDS
 SoundFile jump;
@@ -92,13 +95,12 @@ Mario mario = new Mario(new PVector(0, 0), g, imgScale);
 
 //test
 String[] eIds = {
-    "goomba"
+    "goomba",
+    "koopa"
 };
 
 ArrayList<Enemy> enemies = new ArrayList<Enemy>();
   
-
-
 
 
 void setup() {
@@ -183,7 +185,11 @@ void setup() {
   
   gbaImgs[0] = loadImage("EnemySprites/goomba1.png");
   gbaImgs[1] = loadImage("EnemySprites/goomba2.png");
-  gbaImgs[2] = loadImage("EnemySprites/goombadie.png");
+  gbaImgs[2] = loadImage("EnemySprites/goomba3.png");
+  
+  kpaImgs[0] = loadImage("EnemySprites/koopa1.png");
+  kpaImgs[1] = loadImage("EnemySprites/koopa2.png");
+  kpaImgs[2] = loadImage("EnemySprites/koopa3.png");
   
   
   
@@ -199,23 +205,23 @@ void setup() {
 
   //rescale all tiles
   for (int i = 0; i < mFrames.length; i++) {
-
     mFrames[i].resize(imgScale, imgScale);
   }
 
   for (int i = 0; i < blocks.length; i++) {
-
     blocks[i].resize(imgScale, imgScale);
   }
   
   for (int i = 0; i < decoPI.length; i++) {
-
     decoPI[i].resize(imgScale * 5, 0);
   }
   
   for (int i = 0; i < gbaImgs.length; i++) {
-
     gbaImgs[i].resize(imgScale, 0);
+  }
+  
+  for (int i = 0; i < kpaImgs.length; i++) {
+    kpaImgs[i].resize(imgScale, 0);
   }
   
   title.resize(528 + imgScale, 381 + imgScale);
@@ -246,10 +252,6 @@ void mouseClicked() {
    coin.play();
    //}
   }
-  
-  enemies.add(new Enemy(new PVector (mouseX, mouseY), eIds[(int)random(eIds.length)], imgScale, mario));
-
-  
 }
 
 void keyReleased() {
@@ -287,9 +289,9 @@ void draw() {
     }
   }
   //END GRAVITY AND JUMPING
-  if(mousePressed) {
+  /*if(mousePressed) {
     enemies.add(new Enemy(new PVector (mouseX, mouseY), eIds[(int)random(eIds.length)], imgScale, mario));
-  }
+  }*/
   
   //SCROLLING  
   if(state == "game" && paused == -1) {
@@ -312,10 +314,12 @@ void draw() {
     
       if(floor.get(i).update(scrollSpeed, imgScale, floor) == false) {                                 //move tile, and check if tile is off screen left
         i--;
-        floor.add(new Block(new PVector(floor.get(floor.size() - 1).getPos().x + imgScale, height / 2 + 4 * imgScale), 
-                            blocks[0] 
-                            ));                                                            //add new position on right
+        floor.add(new Block(new PVector(floor.get(floor.size() - 1).getPos().x + imgScale, height / 2 + 4 * imgScale), blocks[0]));                 //add new position on right
         tileCounter ++;
+        
+        if((int)random(0, 99) < enemyChance) {
+         enemies.add(new Enemy(new PVector (floor.get(floor.size() - 1).pos.x, floor.get(floor.size() - 1).pos.y), eIds[(int)random(eIds.length)], imgScale, mario)); 
+        }
         
         if(tileCounter == 7) {
          
@@ -418,7 +422,7 @@ void draw() {
 
   //DIE 
   if(meters > 150 && state != "die") {
-   die();
+   //die();
   }
   
   

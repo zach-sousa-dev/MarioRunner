@@ -9,7 +9,7 @@ class Enemy {
   */
 
   String id;    //stores enemy type (allowed are; "goomba"), these are randomly selected via an array in the main program
-  int lifetime = 0;  //how many frames has the enemy been alive
+  int count = 0;  //how many frames has the enemy been alive/death animation has been played
   PImage frame = gbaImgs[0];   //stores the current anmation frame
   
   int siz;
@@ -24,8 +24,9 @@ class Enemy {
   boolean grounded       = false;                    //are we touching the ground
   boolean hit            = false;
   boolean deathAnim      = false;
+  int deathTime          = 60;
   boolean isAlive        = true;
-  int boost              = 20;
+  int boost              = 15;
   //STORAGE
   ArrayList<Block> stoodOn = new ArrayList<Block>();   //holds the current blocks that are being stood on (should be only a max of 2 I think)
   
@@ -44,8 +45,8 @@ class Enemy {
   
   //update should be called once every frame during gameplay
   void update(ArrayList<Block> blocks, String state, float scrollSpeed) {
-    vel   += g;                //enemy's velocity increasing by gravity
-    pos.y += vel;              //enemy's y is increased (or decreased) by his velocity
+    vel   += g;                        //enemy's velocity increasing by gravity
+    pos.y += vel;                      //enemy's y is increased (or decreased) by his velocity
     pos.x -= scrollSpeed + speed;
     
     
@@ -57,14 +58,18 @@ class Enemy {
       pos.y = height/2 + (siz * 3);
     }
     
-    lifetime++;   //lifetime is increased at the end of each frame update
+    count++;   //count is increased at the end of each frame update
     
     if(abs(mario.mPos.x - pos.x) < siz && abs(mario.mPos.y - pos.y) < siz && !deathAnim) {
       println("hit");
       hit = true;
-    } else if(abs(mario.mPos.x - pos.x) < siz && abs(mario.mPos.y - (pos.y - imgScale)) < siz/2) {
+    } else if(abs(mario.mPos.x - pos.x) < siz && abs(mario.mPos.y - (pos.y - imgScale)) < siz/2 && deathAnim == false) {
       deathAnim = true;
-      mario.mVel -= boost;
+      count = 0;
+      if(mario.mVel > 0) {
+        mario.mVel = -boost;
+      }
+      speed = 0;
     }
   }
   
@@ -88,12 +93,38 @@ class Enemy {
   void animate() {
    
     if(id == "goomba") {
-      if(lifetime % 10 == 0) {
+      if(!deathAnim) {
+      if(count % 10 == 0) {
         if(frame == gbaImgs[0]) {
           frame = gbaImgs[1];
         } else {
-          frame = gbaImgs[0]; 
+            frame = gbaImgs[0]; 
+          }
         }
+      } else {
+         if(count == deathTime) {
+           isAlive = false;
+         }
+         frame = gbaImgs[2];
+         count++;
+      }
+    }
+    
+    if(id == "koopa") {
+      if(!deathAnim) {
+      if(count % 10 == 0) {
+        if(frame == kpaImgs[0]) {
+          frame = kpaImgs[1];
+        } else {
+            frame = kpaImgs[0]; 
+          }
+        }
+      } else {
+         if(count == deathTime) {
+           isAlive = false;
+         }
+         frame = kpaImgs[2];
+         count++;
       }
     }
   }
