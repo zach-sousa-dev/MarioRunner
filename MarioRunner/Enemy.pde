@@ -26,7 +26,7 @@ class Enemy {
   boolean deathAnim      = false;
   int deathTime          = 60;
   boolean isAlive        = true;
-  int boost              = 15;
+  int boost              = 10;
   //STORAGE
   ArrayList<Block> stoodOn = new ArrayList<Block>();   //holds the current blocks that are being stood on (should be only a max of 2 I think)
   
@@ -61,13 +61,14 @@ class Enemy {
     count++;   //count is increased at the end of each frame update
     
     if(abs(mario.mPos.x - pos.x) < siz && abs(mario.mPos.y - pos.y) < siz && !deathAnim) {
-      println("hit");
+      //println("hit");
       hit = true;
     } else if(abs(mario.mPos.x - pos.x) < siz && abs(mario.mPos.y - (pos.y - imgScale)) < siz/2 && deathAnim == false) {
       deathAnim = true;
       count = 0;
       if(mario.mVel > 0) {
         mario.mVel = -boost;
+        mario.jumping = true;
       }
       speed = 0;
     }

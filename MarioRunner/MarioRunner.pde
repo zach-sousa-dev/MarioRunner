@@ -276,9 +276,9 @@ void draw() {
   
   //VVV GRAVITY AND JUMPING VVV
   if((keyPressed && key == 'w' || mousePressed) && mario.grounded) {                            //if w is pressed and touching ground
-    mario.grounded = false;                                                   //leave ground
-    mario.mVel = -15;                                                         //decrease velocity (jump)
-    jump.play();
+    //mario.grounded = false;                                                   //leave ground
+    //mario.mVel = -15;                                                         //decrease velocity (jump)
+    //jump.play();
     if(state == "title") {
      //music[curTrack].stop();                                            //stop menu music
      state = "game";                                                    //now playing
@@ -466,7 +466,7 @@ void draw() {
       }
     }
   }
-  println(enemies.size());
+  //println(enemies.size());
 }
  
  

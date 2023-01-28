@@ -11,10 +11,14 @@ class Mario {
     
   //POSITON/PHYSICS
   PVector mPos           = new PVector(0, 0);        //default position
-  float jumpVel          = 15;                       //starting jump velocity
+  float jumpVel          = 9;//15;                  //jump velocity initial value
+  float jumpMultiplier   = 0.1;                     //by what value should the velocity be multiplied at while holding the jump button
   float mVel             = 0;                        //default y velocity
   float g                = 0.5;                      //CONSTANT force of gravity
   boolean grounded       = false;                    //are we touching the ground
+  boolean jumping        = false;                    //used to specifically say when we are jumping rather than standing or falling
+  int     jumpCount      = 1;                        //stores the amount of frames that the jump button has been pressed for, if it reaches the max then we stop jumping
+  int     jumpMax        = 10;                       //maximum amount of frames that the jump button can be regiesterd
   
   //STORAGE
   ArrayList<Block> stoodOn = new ArrayList<Block>();   //holds the current blocks that are being stood on (should be only a max of 2 I think)
@@ -40,6 +44,23 @@ class Mario {
         mVel = 0;                  //mario's velocity is set to 0 because he is not falling
         mPos.y = height/2 + (siz * 3);
       }
+      
+      if((keyPressed && key == 'w' || mousePressed) && jumping) {
+        jumpIncrement();
+      }
+      if(!(keyPressed && key == 'w' || mousePressed) && jumping) {
+        jumping = false;
+      }
+      if(jumping == false) {
+        jumpCount = 1; 
+      }
+      if((keyPressed && key == 'w' || mousePressed) && grounded) {
+        jumping  = true;
+        grounded = false;
+        jump.play();
+        mVel = -jumpVel;
+      }
+      
       
       animate(state);                   //choose animation frames
       show();
@@ -70,10 +91,13 @@ class Mario {
   
   
   
-  void jump() {
-    grounded = false;                         //leave ground
-    mVel = -jumpVel;                          //decrease velocity (jump)
-    jump.play();
+  void jumpIncrement() {
+    mVel += mVel * jumpMultiplier;
+    println(mVel);
+    jumpCount++;
+    if(jumpCount >= jumpMax) {
+      jumping = false;
+    }
   }
   
   
