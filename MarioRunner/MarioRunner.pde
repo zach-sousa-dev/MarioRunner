@@ -1,5 +1,11 @@
 import processing.sound.*;
-
+/**
+* Infinite runner game based on the Super Mario Bros. Games
+*
+* Incomplete - currently features a scrolling environment, death screen, title, and game loop
+* @author Zachary Sousa
+* @version 0.11
+*/
 
 //GAME RULES
 String state         = "title";                           //controls the game state (title, playing, game over)

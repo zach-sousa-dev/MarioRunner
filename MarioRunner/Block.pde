@@ -16,7 +16,7 @@ public Block(PVector pos, PImage tile, ArrayList<Block> arLi) {
   this.arLi    = arLi;
 }
 
-void Block(PVector pos, PImage tile, boolean isSolid, ArrayList<Block> arLi) {
+public Block(PVector pos, PImage tile, boolean isSolid, ArrayList<Block> arLi) {
   this.pos     = pos;
   this.tile    = tile;
   this.arLi    = arLi;
