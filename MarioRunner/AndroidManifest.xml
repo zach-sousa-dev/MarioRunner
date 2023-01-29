@@ -13,5 +13,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity> 
+<<<<<<< HEAD
+=======
+	 android:largeHeap="true" 
+>>>>>>> 0d6bec38a578f9f9582c7e42aaa961d48d79c611
     </application>
 </manifest>
